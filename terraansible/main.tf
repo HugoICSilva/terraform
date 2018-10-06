@@ -52,17 +52,16 @@ resource "aws_iam_role" "s3_access_role" {
 EOF
 }
 
-
 #------------------ VPC ---------------------
 
 resource "aws_vpc" "wp_vpc" {
   cidr_block           = "${var.vpc_cidr}"
   enable_dns_hostnames = true
-  enable_dns_support    = true
+  enable_dns_support   = true
 
   tags {
     Name = "wp_vpc"
-   }
+  }
 }
 
 # internet gateway
@@ -77,21 +76,26 @@ resource "aws_internet_gateway" "wp_internet_gateway" {
 
 # Route tables
 
-resource "aws_route_table" "wp_public_rt" { 
- vpc_id = "${aws_vpc.wp_vpc.id}"
+resource "aws_route_table" "wp_public_rt" {
+  vpc_id = "${aws_vpc.wp_vpc.id}"
 
- route {
-   cidr_block = "0.0.0.0/0"
-   gateway_id = "${aws_internet_gateway.wp_internet_gateway.id}"
- }
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.wp_internet_gateway.id}"
+  }
 
- tags {
-   Name = "wp_public"
+  tags {
+    Name = "wp_public"
   }
 }
 
 resource "aws_default_route_table" "wp_private_rt" {
   default_route_table_id = "${aws_vpc.wp_vpc.default_route_table_id}"
+
+  route {
+     cidr_block = "0.0.0.0/0"
+     nat_gateway_id = "${aws_nat_gateway.nat.id}"
+  }
 
   tags {
     Name = "wp_private"
@@ -116,12 +120,11 @@ resource "aws_subnet" "wp_public2_subnet" {
   cidr_block              = "${var.cidrs["public2"]}"
   map_public_ip_on_launch = true
   availability_zone       = "${data.aws_availability_zones.available.names[1]}"
- 
+
   tags {
     Name = "wp_public2"
   }
 }
-
 
 resource "aws_subnet" "wp_private1_subnet" {
   vpc_id                  = "${aws_vpc.wp_vpc.id}"
@@ -211,10 +214,30 @@ resource "aws_subnet" "wp_oracle2_subnet" {
   }
 }
 
+################################################################################
+#################### NAT GTW TESTE ############################################# 
+
+
+# A EIP for the NAT gateway.
+resource "aws_eip" "tuto_eip" {
+  vpc        = true
+#  depends_on = ["wp_internet_gateway"]
+}
+
+
+# The NAT gateway, attached to the _public_ network.
+resource "aws_nat_gateway" "nat" {
+  allocation_id          = "${aws_eip.tuto_eip.id}"
+  subnet_id              = "${aws_subnet.wp_public2_subnet.id}"
+#  depends_on            = ["wp_internet_gateway"]
+}
+
+
+
 #Internet NAT GTW
 
 #resource "aws_nat_gateway" "gw" {
-#  allocation_id = "${aws_eip.nat.id.*.id}"
+#  allocation_id = "${aws_eip.nat.id.default.id}"
 #  subnet_id     = "${aws_subnet.public.wp_public2_subnet.id}"
 #
 #  tags {
@@ -222,9 +245,113 @@ resource "aws_subnet" "wp_oracle2_subnet" {
 #  }
 #}
 
+####################### FIM TESTE ###########################################
+
 #rds subnet group
 resource "aws_db_subnet_group" "wp_rds_subnetgroup" {
   name = "wp_rds_subnetgroup"
 
-  subnet_ids = [":q
+  subnet_ids = ["${aws_subnet.wp_oracle1_subnet.id}",
+    "${aws_subnet.wp_oracle2_subnet.id}",
+  ]
+
+  tags {
+    Name = "wp_oracle_sng"
+  }
+}
+
+# Subnet Associations
+
+resource "aws_route_table_association" "wp_public1_assoc" {
+  subnet_id      = "${aws_subnet.wp_public1_subnet.id}"
+  route_table_id = "${aws_route_table.wp_public_rt.id}"
+}
+
+resource "aws_route_table_association" "wp_public2_assoc" {
+  subnet_id      = "${aws_subnet.wp_public2_subnet.id}"
+  route_table_id = "${aws_route_table.wp_public_rt.id}"
+}
+
+resource "aws_route_table_association" "wp_private1_assoc" {
+  subnet_id      = "${aws_subnet.wp_private1_subnet.id}"
+  route_table_id = "${aws_default_route_table.wp_private_rt.id}"
+}
+
+# Security Groups
+
+resource "aws_security_group" "wp_dev_sg" {
+ name = "wp_dev_sg"
+ description = "Para acesso ao ambiente Dev"
+ vpc_id = "${aws_vpc.wp_vpc.id}"
+
+ #SSH
+
+ ingress {
+   from_port = 22
+   to_port   = 22
+   protocol  = "tcp"
+   cidr_blocks = ["${var.auth_lista}"]
+ }
+
+ egress {
+   from_port  = 22
+   to_port    = 22
+   protocol   = "tcp"
+   cidr_blocks = ["0.0.0.0/0"]
+ }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
