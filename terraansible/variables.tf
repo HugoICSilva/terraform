@@ -6,6 +6,11 @@ variable "vpc_cidr" {}
 variable "cidrs" {
   type = "map"
 }
+
 variable "auth_lista" {
+  type = "list"
+}
+
+variable "elb2_lista" {
   type = "list"
 }

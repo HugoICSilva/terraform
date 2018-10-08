@@ -93,8 +93,8 @@ resource "aws_default_route_table" "wp_private_rt" {
   default_route_table_id = "${aws_vpc.wp_vpc.default_route_table_id}"
 
   route {
-     cidr_block = "0.0.0.0/0"
-     nat_gateway_id = "${aws_nat_gateway.nat.id}"
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = "${aws_nat_gateway.nat.id}"
   }
 
   tags {
@@ -217,22 +217,20 @@ resource "aws_subnet" "wp_oracle2_subnet" {
 ################################################################################
 #################### NAT GTW TESTE ############################################# 
 
-
 # A EIP for the NAT gateway.
 resource "aws_eip" "tuto_eip" {
-  vpc        = true
-#  depends_on = ["wp_internet_gateway"]
-}
+  vpc = true
 
+  #  depends_on = ["wp_internet_gateway"]
+}
 
 # The NAT gateway, attached to the _public_ network.
 resource "aws_nat_gateway" "nat" {
-  allocation_id          = "${aws_eip.tuto_eip.id}"
-  subnet_id              = "${aws_subnet.wp_public2_subnet.id}"
-#  depends_on            = ["wp_internet_gateway"]
+  allocation_id = "${aws_eip.tuto_eip.id}"
+  subnet_id     = "${aws_subnet.wp_public2_subnet.id}"
+
+  #  depends_on            = ["wp_internet_gateway"]
 }
-
-
 
 #Internet NAT GTW
 
@@ -277,81 +275,293 @@ resource "aws_route_table_association" "wp_private1_assoc" {
   route_table_id = "${aws_default_route_table.wp_private_rt.id}"
 }
 
-# Security Groups
+#############################################################
+##
+## Security groups
+##
 
-resource "aws_security_group" "wp_dev_sg" {
- name = "wp_dev_sg"
- description = "Para acesso ao ambiente Dev"
- vpc_id = "${aws_vpc.wp_vpc.id}"
+#############################################################
+##
+## Security groups
+##
 
- #SSH
+#Public SG Bastion
 
- ingress {
-   from_port = 22
-   to_port   = 22
-   protocol  = "tcp"
-   cidr_blocks = ["${var.auth_lista}"]
- }
+resource "aws_security_group" "wp_bastion_sg" {
+  name        = "wp_bastion_sg"
+  description = "Used forBastion"
+  vpc_id      = "${aws_vpc.wp_vpc.id}"
 
- egress {
-   from_port  = 22
-   to_port    = 22
-   protocol   = "tcp"
-   cidr_blocks = ["0.0.0.0/0"]
- }
+  #SSH
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.auth_lista}"]
+  }
+  egress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.auth_lista}"]
+  }
 }
 
+#Public SG ELB1
 
+resource "aws_security_group" "wp_elb1_sg" {
+  name        = "wp_elb1_sg"
+  description = "Used for public ELB1"
+  vpc_id      = "${aws_vpc.wp_vpc.id}"
 
+  #Open POrts
 
+  ingress {
+    from_port   = 8022
+    to_port     = 8022
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 8024
+    to_port     = 8024
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
+  #Outbound "public"
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
+#Private SG ELB2
 
+resource "aws_security_group" "wp_elb2_sg" {
+  name        = "wp_elb2_sg"
+  description = "Used for private ELB2"
+  vpc_id      = "${aws_vpc.wp_vpc.id}"
 
+  #Open Ports
 
+  ingress {
+    from_port   = 8022
+    to_port     = 8022
+    protocol    = "tcp"
+    cidr_blocks = ["${var.elb2_lista}"]
+  }
+  ingress {
+    from_port   = 8023
+    to_port     = 8023
+    protocol    = "tcp"
+    cidr_blocks = ["${var.elb2_lista}"]
+  }
+  ingress {
+    from_port   = 8024
+    to_port     = 8024
+    protocol    = "tcp"
+    cidr_blocks = ["${var.elb2_lista}"]
+  }
+  ingress {
+    from_port   = 7023
+    to_port     = 7023
+    protocol    = "tcp"
+    cidr_blocks = ["${var.elb2_lista}"]
+  }
+  ingress {
+    from_port   = 7024
+    to_port     = 7024
+    protocol    = "tcp"
+    cidr_blocks = ["${var.elb2_lista}"]
+  }
+  ingress {
+    from_port   = 7022
+    to_port     = 7022
+    protocol    = "tcp"
+    cidr_blocks = ["${var.elb2_lista}"]
+  }
 
+  #Outbound "private elb2"
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+}
 
+#Front-End SG
 
+resource "aws_security_group" "wp_front_sg" {
+  name        = "wp_front_sg"
+  description = "Used FRONT instances"
+  vpc_id      = "${aws_vpc.wp_vpc.id}"
 
+  # INBounds
 
+  ingress {
+    from_port = 8022
+    to_port   = 8022
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_elb1_sg.id}"]
+  }
+  ingress {
+    from_port = 8024
+    to_port   = 8024
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_elb1_sg.id}"]
+  }
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_bastion_sg.id}",
+      "${aws_security_group.wp_tool_sg.id}",
+    ]
+  }
+  # Outbound
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+}
 
+#Mid-Tear SG
 
+resource "aws_security_group" "wp_mid_sg" {
+  name        = "wp_mid_sg"
+  description = "Used for ELB2 access"
+  vpc_id      = "${aws_vpc.wp_vpc.id}"
 
+  #Open Ports
 
+  ingress {
+    from_port = 8022
+    to_port   = 8022
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+  }
+  ingress {
+    from_port = 8023
+    to_port   = 8023
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+  }
+  ingress {
+    from_port = 8024
+    to_port   = 8024
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+  }
+  ingress {
+    from_port = 7023
+    to_port   = 7023
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+  }
+  ingress {
+    from_port = 7024
+    to_port   = 7024
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+  }
+  ingress {
+    from_port = 7022
+    to_port   = 7022
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+  }
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_bastion_sg.id}",
+      "${aws_security_group.wp_tool_sg.id}",
+    ]
+  }
 
+  #Outbound
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
+#Management SG
 
+resource "aws_security_group" "wp_tool_sg" {
+  name        = "wp_tool_sg"
+  description = "Used for manage instances"
+  vpc_id      = "${aws_vpc.wp_vpc.id}"
 
+  # INBounds
 
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+  # Outbound
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+}
 
+#DB Security Group
 
+resource "aws_security_group" "wp_db_sg" {
+  name        = "wp_db_sg"
+  description = "Used for DB instances"
+  vpc_id      = "${aws_vpc.wp_vpc.id}"
 
+  # DB access security group
 
+  ingress {
+    from_port = 1521
+    to_port   = 1521
+    protocol  = "tcp"
 
+    security_groups = ["${aws_security_group.wp_mid_sg.id}"]
+  }
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    security_groups = ["${aws_security_group.wp_bastion_sg.id}",
+      "${aws_security_group.wp_tool_sg.id}",
+    ]
+  }
+  # Outbound
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${var.vpc_cidr}"]
+  }
+}
