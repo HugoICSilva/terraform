@@ -218,7 +218,7 @@ resource "aws_subnet" "wp_oracle2_subnet" {
 #################### NAT GTW TESTE ############################################# 
 
 # A EIP for the NAT gateway.
-resource "aws_eip" "tuto_eip" {
+resource "aws_eip" "wp_nat_eip" {
   vpc = true
 
   #  depends_on = ["wp_internet_gateway"]
@@ -226,7 +226,7 @@ resource "aws_eip" "tuto_eip" {
 
 # The NAT gateway, attached to the _public_ network.
 resource "aws_nat_gateway" "nat" {
-  allocation_id = "${aws_eip.tuto_eip.id}"
+  allocation_id = "${aws_eip.wp_nat_eip.id}"
   subnet_id     = "${aws_subnet.wp_public2_subnet.id}"
 
   #  depends_on            = ["wp_internet_gateway"]

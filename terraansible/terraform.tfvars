@@ -15,3 +15,5 @@ cidrs       = {
 }
 auth_lista = [ "213.30.18.1/32", "10.20.32.0/19"]
 elb2_lista = [ "10.0.3.0/24", "10.0.4.0/24"]
+instance_type_bastion = "t2.micro"
+bastion_ami = "ami-0e82b8b6afa30f2cd"

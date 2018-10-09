@@ -14,3 +14,6 @@ variable "auth_lista" {
 variable "elb2_lista" {
   type = "list"
 }
+
+variable "instance_type_bastion" {}
+variable "bastion_ami" {}

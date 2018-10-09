@@ -1,0 +1,12 @@
+#!/bin/bash
+
+mkdir -p /home/ec2-user/.ssh
+cat <<FILE > /home/ec2-user/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXeOFVyC+1JstyT6oGf1F/17ycriYZAfwpCbMR2+nxEl3vjpqJRe63LWWo6IPhbofaGrE5pWM5nke3cAqrLdcNGzXyfq3+sQOOBnpnQ6+H6vurdfTa6Z5d53YNgzEbaAsFwivm5zwwxMJEt6Fl2jz0Kp1UpgmJ1g5xnATnNziOYas6U3FW6xqBTYurlesp2s+hW8KHjtUxLoW+YBibO2h8oU1RyORWM28qgXQHXet3vjikYh62m1UQ9U10WGnSPeOFnQ64KWc9duRFL6U6gHfMOMRerQwIKwRKiwBEj7oUPPHnZWhwYdfAIkQvAOJOnCBLcHzWkP9rTCwOLEZRoC0uHNtCkvM6t9Dwkv1H+VFSgZXDiLDKhq0MDDJ5Sc6B1EGjOL2Zc4QuOI5eBV9rZFv4KvL7C+YVHaDd+JkiFNnOFaj9/fsKPJDEVOMqZha4bfipDzoSYSktzAFhQZmiHf3mQfXevzhhPtEU3KLhXX/FOWViptBkQ9XzugHnwrH6oJzuPLzKo2cAzW8Er/FbqVKs7yU+HIM5Xu7+IygI01tLJW/nAbA80/Chk49nDLNMcR3MC0nWNhr7hP9Os6BVxE+5Yu/ecXEgC6FNhOvkTcpLMZzORLetbM/yY5T8+28VUR+KmekAaxjPfumk2lnDIM7jyLXox3xtwKp9y2RoTK6DvQ== NB24571
+FILE
+
+chown ec2-user.ec2-user /home/ec2-user/.ssh/authorized_keys
+chmod 400 /home/ec2-user/.ssh/authorized_keys
+
+yum update -y 
+yum upgrade -y
