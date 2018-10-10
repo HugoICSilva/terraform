@@ -304,7 +304,7 @@ resource "aws_security_group" "wp_bastion_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.auth_lista}"]
+    cidr_blocks = ["${var.auth_lista2}"]
   }
 }
 
@@ -433,7 +433,7 @@ resource "aws_security_group" "wp_front_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["${var.vpc_cidr}"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -528,7 +528,7 @@ resource "aws_security_group" "wp_tool_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["${var.vpc_cidr}"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
@@ -562,6 +562,6 @@ resource "aws_security_group" "wp_db_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["${var.vpc_cidr}"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }

@@ -11,9 +11,15 @@ variable "auth_lista" {
   type = "list"
 }
 
+variable "auth_lista2" {
+  type = "list"
+}
+
 variable "elb2_lista" {
   type = "list"
 }
 
 variable "instance_type_bastion" {}
 variable "bastion_ami" {}
+variable "instance_type_front" {}
+variable "front_ami" {}

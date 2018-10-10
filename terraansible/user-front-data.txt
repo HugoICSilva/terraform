@@ -1,0 +1,12 @@
+#!/bin/bash
+
+## mount partition dados
+mkfs -t ext4 /dev/nvme1n1
+mkdir /opt/dados
+mount /dev/dados /opt/dados
+echo /dev/nvme1n1  /opt/dados ext4 defaults,nofail 0 2 >> /etc/fstab
+mount -a
+
+
+## update
+yum update -y 

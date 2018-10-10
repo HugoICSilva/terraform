@@ -1,0 +1,40 @@
+#!/bin/bash
+
+## Ansible user
+adduser ansible
+echo "ansible ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+## msemuser user + key
+adduser msemuser; passwd msemuser; usermod -aG wheel celfocus
+echo "msemuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+mkdir -p /home/msemuser/.ssh
+cat <<FILE > /home/msemuser/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAvljykjzZlaSw1u4f/RagWKyYqG6xsSECqIruAg8yYSuGXldjkf9HbSm2N/2kN7uTNEDaoT4UCuhfpEsKfm2DPBXTVmV/Ldh2nXesKsZMquVfvbSII7LRQhW4v2g2wf1KJ4KlmN0QeFmbAumVbLQdaEazCx6A1NHvr6uiSPJDOaWhHaXVTCF4pnUTvcdKCoIPJ4QgwcKBGiy6YZEra3d589ND4U+iSXPcIyQlRXu9e/lFwxI7L7ijDsJ913Wi6HE/X9Gks9BKw+BqQ//D5b7COjJ6l8h1I9MP8Qos/Ts5f+Ql+x04wjduInevDk+BL6Tec+N/s20rjD+7DGl0kwKB7Q==
+FILE
+
+chown -R msemuser.msemuser /home/msemuser/.ssh/
+chmod 400 /home/msemuser/.ssh/authorized_keys
+
+## celfocus user + key
+adduser celfocus
+echo "celfocus ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+mkdir -p /home/celfocus/.ssh
+cat <<FILE > /home/celfocus/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXeOFVyC+1JstyT6oGf1F/17ycriYZAfwpCbMR2+nxEl3vjpqJRe63LWWo6IPhbofaGrE5pWM5nke3cAqrLdcNGzXyfq3+sQOOBnpnQ6+H6vurdfTa6Z5d53YNgzEbaAsFwivm5zwwxMJEt6Fl2jz0Kp1UpgmJ1g5xnATnNziOYas6U3FW6xqBTYurlesp2s+hW8KHjtUxLoW+YBibO2h8oU1RyORWM28qgXQHXet3vjikYh62m1UQ9U10WGnSPeOFnQ64KWc9duRFL6U6gHfMOMRerQwIKwRKiwBEj7oUPPHnZWhwYdfAIkQvAOJOnCBLcHzWkP9rTCwOLEZRoC0uHNtCkvM6t9Dwkv1H+VFSgZXDiLDKhq0MDDJ5Sc6B1EGjOL2Zc4QuOI5eBV9rZFv4KvL7C+YVHaDd+JkiFNnOFaj9/fsKPJDEVOMqZha4bfipDzoSYSktzAFhQZmiHf3mQfXevzhhPtEU3KLhXX/FOWViptBkQ9XzugHnwrH6oJzuPLzKo2cAzW8Er/FbqVKs7yU+HIM5Xu7+IygI01tLJW/nAbA80/Chk49nDLNMcR3MC0nWNhr7hP9Os6BVxE+5Yu/ecXEgC6FNhOvkTcpLMZzORLetbM/yY5T8+28VUR+KmekAaxjPfumk2lnDIM7jyLXox3xtwKp9y2RoTK6DvQ== NB24571
+FILE
+
+chown -R celfocus.celfocus /home/celfocus/.ssh/
+chmod 400 /home/celfocus/.ssh/authorized_keys
+
+## mount partition dados
+mkfs -t ext4 /dev/nvme1n1
+mkdir /opt/dados
+mount /dev/dados /opt/dados
+echo /dev/nvme1n1  /opt/dados ext4 defaults,nofail 0 2 >> /etc/fstab
+mount -a
+
+
+## update
+yum update -y 
