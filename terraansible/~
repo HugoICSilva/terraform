@@ -1,0 +1,35 @@
+#!/bin/bash
+
+disco='/dev/nvme1n1'
+
+
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${disco}
+  o
+  n
+  p
+  1
+    
+  +60000M
+  n
+  p
+  2
+    
+    
+  +40000M
+  p 
+  w 
+  q 
+EOF
+
+path60='/dev/nvme1n1p1'
+
+## mount partition dados
+mkfs -t ext4 ${path60}
+mkdir /opt/app
+
+echo ${path60}  /opt/app ext4 defaults,nofail 0 2 >> /etc/fstab
+mount -a
+
+
+## update
+#yum update -y 

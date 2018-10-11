@@ -8,40 +8,12 @@
 
 disco='/dev/nvme1n1'
 
-# Partir disco em 60G e 40G
 
-sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${disco}
-  o
-  n
-  p
-  1
-    
-  +60000M
-  n
-  p
-  2
-    
-    
-  +40000M
-  p 
-  w 
-  q 
-EOF
-
-
-#---------> Montar particoes
-path60='/dev/nvme1n1p1'
-path40='/dev/nvme1n1p2'
 
 ## mount partition /opt/app
-mkfs -t ext4 ${path60}
+mkfs -t ext4 ${disco}
 mkdir /opt/app
-echo ${path60}  /opt/app ext4 defaults,nofail 0 2 >> /etc/fstab
-
-## mount partition /var/app
-mkfs -t ext4 ${path40}
-mkdir /var/app
-echo ${path40}  /var/app ext4 defaults,nofail 0 2 >> /etc/fstab
+echo ${disco}  /opt/app ext4 defaults,nofail 0 2 >> /etc/fstab
 
 mount -a
 
@@ -50,7 +22,7 @@ mount -a
 ## HOST FILE LIST						 #
 ##								 #
 ##################################################################
-hostnamectl set-hostname wp_front_az1				
+hostnamectl set-hostname wp_db_az1
 
 echo '10.0.3.225	wp_front_az1' | sudo tee -a /etc/hosts
 echo '10.0.4.225	wp_front_az2' | sudo tee -a /etc/hosts
@@ -59,8 +31,8 @@ echo '10.0.6.225	wp_web_az2'   | sudo tee -a /etc/hosts
 echo '10.0.9.225	wp_db_az1'    | sudo tee -a /etc/hosts
 echo '10.0.7.224	wp_jenkins'   | sudo tee -a /etc/hosts
 echo '10.0.7.225	wp_nagios'    | sudo tee -a /etc/hosts
-echo '10.0.8.225	wp_ansible'   | sudo tee -a /etc/hosts
-
+echo '10.0.8.225	wp_ansible'   | sudo tee -a /etc/hosts								 
+								
 ##################################################################
 
 

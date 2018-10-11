@@ -80,7 +80,7 @@ resource "aws_route_table" "wp_public_rt" {
   vpc_id = "${aws_vpc.wp_vpc.id}"
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = "${var.null_list}"
     gateway_id = "${aws_internet_gateway.wp_internet_gateway.id}"
   }
 
@@ -93,7 +93,7 @@ resource "aws_default_route_table" "wp_private_rt" {
   default_route_table_id = "${aws_vpc.wp_vpc.default_route_table_id}"
 
   route {
-    cidr_block     = "0.0.0.0/0"
+    cidr_block     = "${var.null_list}"
     nat_gateway_id = "${aws_nat_gateway.nat.id}"
   }
 
@@ -214,8 +214,7 @@ resource "aws_subnet" "wp_oracle2_subnet" {
   }
 }
 
-################################################################################
-#################### NAT GTW TESTE ############################################# 
+#-----------------------> NAT GATEWAY 
 
 # A EIP for the NAT gateway.
 resource "aws_eip" "wp_nat_eip" {
@@ -232,20 +231,7 @@ resource "aws_nat_gateway" "nat" {
   #  depends_on            = ["wp_internet_gateway"]
 }
 
-#Internet NAT GTW
-
-#resource "aws_nat_gateway" "gw" {
-#  allocation_id = "${aws_eip.nat.id.default.id}"
-#  subnet_id     = "${aws_subnet.public.wp_public2_subnet.id}"
-#
-#  tags {
-#    Name = "gw NAT"
-#  }
-#}
-
-####################### FIM TESTE ###########################################
-
-#rds subnet group
+###rds subnet group
 resource "aws_db_subnet_group" "wp_rds_subnetgroup" {
   name = "wp_rds_subnetgroup"
 
@@ -274,11 +260,6 @@ resource "aws_route_table_association" "wp_private1_assoc" {
   subnet_id      = "${aws_subnet.wp_private1_subnet.id}"
   route_table_id = "${aws_default_route_table.wp_private_rt.id}"
 }
-
-#############################################################
-##
-## Security groups
-##
 
 #############################################################
 ##
@@ -321,13 +302,13 @@ resource "aws_security_group" "wp_elb1_sg" {
     from_port   = 8022
     to_port     = 8022
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${var.null_list}"]
   }
   ingress {
     from_port   = 8024
     to_port     = 8024
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${var.null_list}"]
   }
 
   #Outbound "public"
@@ -336,7 +317,7 @@ resource "aws_security_group" "wp_elb1_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${var.null_list}"]
   }
 }
 
@@ -433,7 +414,7 @@ resource "aws_security_group" "wp_front_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${var.null_list}"]
   }
 }
 
@@ -451,42 +432,42 @@ resource "aws_security_group" "wp_mid_sg" {
     to_port   = 8022
     protocol  = "tcp"
 
-    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+    security_groups = ["${aws_security_group.wp_front_sg.id}"]
   }
   ingress {
     from_port = 8023
     to_port   = 8023
     protocol  = "tcp"
 
-    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+    security_groups = ["${aws_security_group.wp_front_sg.id}"]
   }
   ingress {
     from_port = 8024
     to_port   = 8024
     protocol  = "tcp"
 
-    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+    security_groups = ["${aws_security_group.wp_front_sg.id}"]
   }
   ingress {
     from_port = 7023
     to_port   = 7023
     protocol  = "tcp"
 
-    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+    security_groups = ["${aws_security_group.wp_front_sg.id}"]
   }
   ingress {
     from_port = 7024
     to_port   = 7024
     protocol  = "tcp"
 
-    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+    security_groups = ["${aws_security_group.wp_front_sg.id}"]
   }
   ingress {
     from_port = 7022
     to_port   = 7022
     protocol  = "tcp"
 
-    security_groups = ["${aws_security_group.wp_elb2_sg.id}"]
+    security_groups = ["${aws_security_group.wp_front_sg.id}"]
   }
   ingress {
     from_port = 22
@@ -504,7 +485,7 @@ resource "aws_security_group" "wp_mid_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${var.null_list}"]
   }
 }
 
@@ -528,7 +509,7 @@ resource "aws_security_group" "wp_tool_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${var.null_list}"]
   }
 }
 
@@ -562,6 +543,6 @@ resource "aws_security_group" "wp_db_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["${var.null_list}"]
   }
 }

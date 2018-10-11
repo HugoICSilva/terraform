@@ -22,7 +22,7 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk ${disco}
   2
     
     
-  +40000M
+  +60000M
   p 
   w 
   q 
@@ -50,8 +50,9 @@ mount -a
 ## HOST FILE LIST						 #
 ##								 #
 ##################################################################
-hostnamectl set-hostname wp_front_az1				
 
+hostnamectl set-hostname wp_jenkins
+								 
 echo '10.0.3.225	wp_front_az1' | sudo tee -a /etc/hosts
 echo '10.0.4.225	wp_front_az2' | sudo tee -a /etc/hosts
 echo '10.0.5.225	wp_web_az1'   | sudo tee -a /etc/hosts
@@ -60,7 +61,7 @@ echo '10.0.9.225	wp_db_az1'    | sudo tee -a /etc/hosts
 echo '10.0.7.224	wp_jenkins'   | sudo tee -a /etc/hosts
 echo '10.0.7.225	wp_nagios'    | sudo tee -a /etc/hosts
 echo '10.0.8.225	wp_ansible'   | sudo tee -a /etc/hosts
-
+								
 ##################################################################
 
 

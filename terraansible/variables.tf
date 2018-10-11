@@ -19,7 +19,10 @@ variable "elb2_lista" {
   type = "list"
 }
 
+variable "null_list" {}
 variable "instance_type_bastion" {}
 variable "bastion_ami" {}
 variable "instance_type_front" {}
 variable "front_ami" {}
+variable "instance_type_web" {}
+variable "instance_type_ansible" {}

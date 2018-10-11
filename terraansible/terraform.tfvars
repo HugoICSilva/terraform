@@ -1,6 +1,7 @@
 aws_profile = "superhero"
 aws_region  = "eu-central-1"
 vpc_cidr    = "10.0.0.0/16"
+
 cidrs       = {
  public1  = "10.0.1.0/24"
  public2  = "10.0.2.0/24"
@@ -13,12 +14,19 @@ cidrs       = {
  oracle1  = "10.0.9.0/24"
  oracle2  = "10.0.10.0/24"
 }
+
 auth_lista = [ "213.30.18.1/32", "85.246.181.205/32",
               "10.20.32.0/19"]
+
 auth_lista2 = [ "213.30.18.1/32", "85.246.181.205/32",
               "10.20.32.0/19", "10.0.0.0/16"]
+
 elb2_lista = [ "10.0.3.0/24", "10.0.4.0/24"]
+
+null_list = "0.0.0.0/0"
 instance_type_bastion = "t2.micro"
 bastion_ami = "ami-0e82b8b6afa30f2cd"
 instance_type_front = "t3.large"
+instance_type_web = "t3.xlarge"
+instance_type_ansible = "t2.large"
 front_ami = "ami-023ef79eb6405a1c9"
