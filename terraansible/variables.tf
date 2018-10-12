@@ -19,6 +19,9 @@ variable "elb2_lista" {
   type = "list"
 }
 
+variable "elb_ext_1" {}
+variable "elb_ext_2" {}
+variable "chave" {}
 variable "null_list" {}
 variable "instance_type_bastion" {}
 variable "bastion_ami" {}

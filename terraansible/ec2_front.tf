@@ -6,7 +6,7 @@
 resource "aws_instance" "wp_front_az1" {
   instance_type               = "${var.instance_type_front}"
   count                       = "1"
-  key_name                    = "CelFocus1"
+  key_name                    = "${var.chave}"
   vpc_security_group_ids      = ["${aws_security_group.wp_front_sg.id}"]
   associate_public_ip_address = false
   private_ip                  = "10.0.3.225"
@@ -15,10 +15,9 @@ resource "aws_instance" "wp_front_az1" {
   user_data = "${file("user-front-data.txt")}"
 
   root_block_device {
-    volume_type = "gp2"
-    volume_size = "25"
-
-    #   delete_on_termination = "true"
+    volume_type           = "gp2"
+    volume_size           = "25"
+    delete_on_termination = "true"
   }
 
   ebs_block_device {
@@ -44,7 +43,7 @@ resource "aws_instance" "wp_front_az1" {
 resource "aws_instance" "wp_front_az2" {
   instance_type               = "${var.instance_type_front}"
   count                       = "1"
-  key_name                    = "CelFocus1"
+  key_name                    = "${var.chave}"
   vpc_security_group_ids      = ["${aws_security_group.wp_front_sg.id}"]
   associate_public_ip_address = false
   private_ip                  = "10.0.4.225"
@@ -53,10 +52,9 @@ resource "aws_instance" "wp_front_az2" {
   user_data = "${file("user-front2-data.txt")}"
 
   root_block_device {
-    volume_type = "gp2"
-    volume_size = "25"
-
-    #   delete_on_termination = "true"
+    volume_type           = "gp2"
+    volume_size           = "25"
+    delete_on_termination = "true"
   }
 
   ebs_block_device {

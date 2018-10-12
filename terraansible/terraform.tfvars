@@ -1,5 +1,5 @@
 aws_profile = "superhero"
-aws_region  = "eu-central-1"
+aws_region  = "eu-west-1"
 vpc_cidr    = "10.0.0.0/16"
 
 cidrs       = {
@@ -23,10 +23,13 @@ auth_lista2 = [ "213.30.18.1/32", "85.246.181.205/32",
 
 elb2_lista = [ "10.0.3.0/24", "10.0.4.0/24"]
 
+elb_ext_1 = "8022"
+elb_ext_2 = "8024"
+chave = "CelFocus_Lab001"
 null_list = "0.0.0.0/0"
 instance_type_bastion = "t2.micro"
-bastion_ami = "ami-0e82b8b6afa30f2cd"
+bastion_ami = "ami-0c21ae4a3bd190229"
 instance_type_front = "t3.large"
 instance_type_web = "t3.xlarge"
 instance_type_ansible = "t2.large"
-front_ami = "ami-023ef79eb6405a1c9"
+front_ami = "ami-0dfe9c96aee4dc8d6"

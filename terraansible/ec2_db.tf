@@ -3,7 +3,7 @@
 resource "aws_instance" "wp_db_az1" {
   instance_type               = "${var.instance_type_web}"
   count                       = "1"
-  key_name                    = "CelFocus1"
+  key_name                    = "${var.chave}"
   vpc_security_group_ids      = ["${aws_security_group.wp_db_sg.id}"]
   associate_public_ip_address = false
   private_ip                  = "10.0.9.225"
@@ -29,7 +29,7 @@ resource "aws_instance" "wp_db_az1" {
 
   ebs_block_device {
     device_name           = "/dev/sdb"
-    volume_size           = 200
+    volume_size           = 500
     volume_type           = "gp2"
     delete_on_termination = true
 

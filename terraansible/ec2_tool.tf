@@ -3,7 +3,7 @@
 resource "aws_instance" "wp_jenkins" {
   instance_type               = "${var.instance_type_web}"
   count                       = "1"
-  key_name                    = "CelFocus1"
+  key_name                    = "${var.chave}"
   vpc_security_group_ids      = ["${aws_security_group.wp_tool_sg.id}"]
   associate_public_ip_address = false
   private_ip                  = "10.0.7.224"
@@ -12,17 +12,16 @@ resource "aws_instance" "wp_jenkins" {
   user_data = "${file("user-jenkins-data.txt")}"
 
   root_block_device {
-    volume_type = "gp2"
-    volume_size = "25"
-
-    #   delete_on_termination = "true"
+    volume_type           = "gp2"
+    volume_size           = "25"
+    delete_on_termination = "true"
   }
 
   ebs_block_device {
     device_name           = "/dev/sdg"
     volume_size           = 120
     volume_type           = "gp2"
-    delete_on_termination = true
+    delete_on_termination = "true"
 
     #    snapshot_id = "snap-0a178ac69ad3f119e"
   }
@@ -41,7 +40,7 @@ resource "aws_instance" "wp_jenkins" {
 resource "aws_instance" "wp_nagios" {
   instance_type               = "${var.instance_type_front}"
   count                       = "1"
-  key_name                    = "CelFocus1"
+  key_name                    = "${var.chave}"
   vpc_security_group_ids      = ["${aws_security_group.wp_tool_sg.id}"]
   associate_public_ip_address = false
   private_ip                  = "10.0.7.225"
@@ -50,17 +49,16 @@ resource "aws_instance" "wp_nagios" {
   user_data = "${file("user-nagios-data.txt")}"
 
   root_block_device {
-    volume_type = "gp2"
-    volume_size = "25"
-
-    #   delete_on_termination = "true"
+    volume_type           = "gp2"
+    volume_size           = "25"
+    delete_on_termination = "true"
   }
 
   ebs_block_device {
     device_name           = "/dev/sdg"
     volume_size           = 100
     volume_type           = "gp2"
-    delete_on_termination = true
+    delete_on_termination = "true"
 
     #    snapshot_id = "snap-0a178ac69ad3f119e"
   }
@@ -79,7 +77,7 @@ resource "aws_instance" "wp_nagios" {
 resource "aws_instance" "wp_ansible" {
   instance_type               = "${var.instance_type_ansible}"
   count                       = "1"
-  key_name                    = "CelFocus1"
+  key_name                    = "${var.chave}"
   vpc_security_group_ids      = ["${aws_security_group.wp_tool_sg.id}"]
   associate_public_ip_address = false
   private_ip                  = "10.0.8.225"
@@ -88,17 +86,16 @@ resource "aws_instance" "wp_ansible" {
   user_data = "${file("user-ansible-data.txt")}"
 
   root_block_device {
-    volume_type = "gp2"
-    volume_size = "25"
-
-    #   delete_on_termination = "true"
+    volume_type           = "gp2"
+    volume_size           = "25"
+    delete_on_termination = "false"
   }
 
   ebs_block_device {
     device_name           = "/dev/sdg"
     volume_size           = 70
     volume_type           = "gp2"
-    delete_on_termination = false
+    delete_on_termination = "false"
   }
 
   tags {
