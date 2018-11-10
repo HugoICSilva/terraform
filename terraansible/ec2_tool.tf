@@ -74,6 +74,24 @@ resource "aws_instance" "wp_nagios" {
 
 # ec2 ansible instance
 
+###############################
+## Atache volumes to EC2
+##
+
+#resource "aws_volume_attachment" "ansible_25" {
+#  device_name = "/dev/sda1"
+#  volume_id   = "vol-0e417d9b6cee5bfe7"
+#  instance_id = "${aws_instance.wp_ansible.id}"
+#}
+
+#resource "aws_volume_attachment" "ansible_70" {
+#  device_name = "/dev/sdg"
+#  volume_id   = "vol-073448103da08aff1"
+#  instance_id = "${aws_instance.wp_ansible.id}"
+#}
+################################
+################################
+
 resource "aws_instance" "wp_ansible" {
   instance_type               = "${var.instance_type_ansible}"
   count                       = "1"
@@ -89,10 +107,19 @@ resource "aws_instance" "wp_ansible" {
     volume_type           = "gp2"
     volume_size           = "25"
     delete_on_termination = "false"
+#    snapshot_id = "snap-0466ecfb2e8af2439"
   }
 
   ebs_block_device {
-    device_name           = "/dev/sdg"
+  device_name           = "/dev/sdg"
+  volume_size           = 70
+  volume_type           = "gp2"
+  delete_on_termination = "false"
+   snapshot_id = ""
+  }
+
+  ebs_block_device {
+    device_name           = "/dev/sdb"
     volume_size           = 70
     volume_type           = "gp2"
     delete_on_termination = "false"

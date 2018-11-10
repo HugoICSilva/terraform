@@ -11,11 +11,11 @@ disco='/dev/nvme1n1'
 
 
 ## mount partition /opt/app
-mkfs -t ext4 ${disco}
-mkdir /opt/app
-echo ${disco}  /opt/app ext4 defaults,nofail 0 2 >> /etc/fstab
+#mkfs -t ext4 ${disco}
+#mkdir /opt/app
+#echo ${disco}  /opt/app ext4 defaults,nofail 0 2 >> /etc/fstab
 
-mount -a
+#mount -a
 
 ##################################################################
 ##								 #
@@ -39,6 +39,7 @@ echo '10.0.8.225	wp_ansible'   | sudo tee -a /etc/hosts
 ## update
 yum update -y
 yum install vim -y
+yum install lvm2 -y
 
 sleep 5
 sudo reboot 
